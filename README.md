@@ -65,3 +65,7 @@ References:
 ## Quartz Backend
 
 - Go to [h2-console](http://localhost:8080/h2-console) 
+- `QRTZ_PAUSED_TRIGGER_GRPS` table contains paused jobs.
+- `QRTZ_FIRED_TRIGGERS` table contains the jobs which were triggered.
+- `QRTZ_JOB_DETAILS` table contains all the jobs.
+- `QRTZ_TRIGGERS` contains the triggered instances.
