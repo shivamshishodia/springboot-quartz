@@ -1,25 +1,67 @@
-# Read Me First
-The following was discovered as part of building this project:
+# Springboot Quartz
 
-* The original package name 'com.shishodia.quartz .email-scheduler ' is invalid and this project uses 'com.shishodia.quartz.emailscheduler' instead.
+A Basic Spring boot Quartz-based Scheduler.
 
-# Getting Started
+References:
+- https://www.callicoder.com/spring-boot-quartz-scheduler-email-scheduling-example/
+- https://howtodoinjava.com/spring-batch/quartz-h2-jdbcjobstore-example/
 
-### Reference Documentation
-For further reference, please consider the following sections:
+## Dependencies
 
-* [Official Apache Maven documentation](https://maven.apache.org/guides/index.html)
-* [Spring Boot Maven Plugin Reference Guide](https://docs.spring.io/spring-boot/docs/2.6.3/maven-plugin/reference/html/)
-* [Create an OCI image](https://docs.spring.io/spring-boot/docs/2.6.3/maven-plugin/reference/html/#build-image)
-* [Spring Web](https://docs.spring.io/spring-boot/docs/2.6.3/reference/htmlsingle/#boot-features-developing-web-applications)
-* [Spring Data JPA](https://docs.spring.io/spring-boot/docs/2.6.3/reference/htmlsingle/#boot-features-jpa-and-spring-data)
-* [Java Mail Sender](https://docs.spring.io/spring-boot/docs/2.6.3/reference/htmlsingle/#boot-features-email)
+- Spring Web
+- Spring Data JPA
+- Java Mail Sender
+- Quartz
+- H2 Database
+- Validation API
+- Lombok
 
-### Guides
-The following guides illustrate how to use some features concretely:
+## Application Properties
 
-* [Building a RESTful Web Service](https://spring.io/guides/gs/rest-service/)
-* [Serving Web Content with Spring MVC](https://spring.io/guides/gs/serving-web-content/)
-* [Building REST services with Spring](https://spring.io/guides/tutorials/bookmarks/)
-* [Accessing Data with JPA](https://spring.io/guides/gs/accessing-data-jpa/)
+- Database
+  - `testdb` database can be accessed on [h2-console](http://localhost:8080/h2-console)
+  - `quartz_tables.sql` provides all the initial tables required for Quartz to run.
+- Quartz
+- Java Mail Sender
 
+# Quartz Scheduler's APIs and Terminologies
+
+1. Scheduler
+   * The Primary API for scheduling, unscheduling, adding, and removing Jobs.
+2. Job
+   * The interface to be implemented by classes that represent a 'job' in Quartz. It has a single method called execute() where you write the work that needs to be performed by the Job.
+3. JobDetail (JobDataMap holds our request data)
+   * A JobDetail represents an instance of a Job. It also contains additional data in the form of a JobDataMap that is passed to the Job when it is executed.
+   * Every JobDetail is identified by a JobKey that consists of a name and a group. The name must be unique within a group.
+4. Trigger
+   * A Trigger, as the name suggests, defines the schedule at which a given Job will be executed. A Job can have many Triggers, but a Trigger can only be associated with one Job.
+   * Every Trigger is identified by a TriggerKey that comprises of a name and a group. The name must be unique within a group.
+   * Just like JobDetails, Triggers can also send parameters/data to the Job.
+5. JobBuilder
+   * JobBuilder is a fluent builder-style API to construct JobDetail instances.
+6. TriggerBuilder
+   * TriggerBuilder is used to instantiate Triggers.
+
+## Building JobDataMap, JobDetails and Triggers
+
+1. `EmailSchedulerController` contains four things:
+   * `buildJobDetail` to build the JobDataMap and JobDetails.
+   * `buildTrigger` to build the trigger.
+   * POST request containing email request data.
+   * `scheduleEmail` to schedule the job. The job envokes `EmailJob.executeInternal()` and passes the JobDetails as JobExecutionContext.
+
+## EmailJob Class
+
+- When the job gets triggered it invokes `EmailJob.executeInternal()`.
+- The job (when triggered) passes the JobExecutionContext as the parameter inside executeInternal().
+- We use JobExecutionContext to fetch the job details back so that they can be used to apply further logic.
+- In this project we fetch the JobDataMap back from the context and use it to send emails.
+
+## Trigger Email Job 
+
+- Use Thunderclient to execute the request exported under resource folder. 
+- The email will be triggered at the provided time.
+
+## Quartz Backend
+
+- Go to [h2-console](http://localhost:8080/h2-console) 
